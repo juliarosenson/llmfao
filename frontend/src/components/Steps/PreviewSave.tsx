@@ -1,4 +1,4 @@
-import React from 'react';
+import { ArrowDownIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -14,25 +14,21 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
-import { CheckCircleIcon, ArrowForwardIcon, ArrowDownIcon } from '@chakra-ui/icons';
+import React from 'react';
 import { ColumnMappingsResponse } from '../../lib/prompt';
 
-// Sample data matching the screenshot
-const originalData = [
-  { name: 'Mr. Joel and Mrs. June Smith', amount: '$100', purpose: 'In honor of Dave Johnson', fund: 'General Fund' },
-  { name: 'Shimon Kohn', amount: '$50', purpose: 'General donation', fund: 'Education Fund' },
-  { name: 'Mr. Eliyahu Frankel', amount: '$450', purpose: 'Memorial for Sarah', fund: 'Building Fund' },
-];
 
 interface PreviewAndSaveProps {
   rules: ColumnMappingsResponse;
   csvPreview: string;
   originalData: Record<string, any>[];
+  templateName: string;
+  fileNamePattern: string;
   onBack: () => void;
   onSave: () => void;
 }
 
-const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, csvPreview, originalData }) => {
+const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, csvPreview, originalData, templateName, fileNamePattern }) => {
   const colsWithRules = rules.filter(mapping => mapping.rule);
   const csvRows = csvPreview.split('\n').map(row => row.split(','));
   
@@ -160,8 +156,8 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
               Template Summary
             </Text>
             <VStack align="flex-start" spacing={1} color="blue.600">
-              <Text fontSize="sm">• Template: "Salesforce Export Template"</Text>
-              <Text fontSize="sm">• File pattern: "export_Start Date_End Date"</Text>
+              <Text fontSize="sm">• Template: {templateName}</Text>
+              <Text fontSize="sm">• File pattern: {fileNamePattern}</Text>
               <Text fontSize="sm">• {colsWithRules.length} transformation rules created</Text>
               <Text fontSize="sm">• {rules.length - colsWithRules.length} field mappings unresolved</Text>
             </VStack>

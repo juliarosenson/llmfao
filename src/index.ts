@@ -44,8 +44,13 @@ app.post('/api/generate', upload.array('file'), async (req, res) => {
     });
 
     console.log('OpenAI response:', completion.choices[0].message.content);
+    
+    // Clean up markdown code block formatting
+    let cleanedResponse = completion.choices[0].message.content || '';
+    cleanedResponse = cleanedResponse.replace(/^```(json|csv)\s*/, '').replace(/\s*```$/, '');
+    
     res.json({
-      response: completion.choices[0].message.content,
+      response: cleanedResponse,
     });
 
     // // Use Claude's format:

@@ -9,7 +9,8 @@ import {
   Input,
   Text,
   useToast,
-  VStack
+  VStack,
+  Spinner
 } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 
@@ -68,6 +69,7 @@ const Upload: React.FC<UploadProps> = ({
           duration: 3000,
           isClosable: true,
         });
+        setLoading(false);
         return;
       }
 
@@ -91,7 +93,37 @@ const Upload: React.FC<UploadProps> = ({
   };
 
   return (
-    <Box w="100vw" maxW="1000px" mt={10} border="2px solid #38b6ff" borderRadius="lg" p={8}>
+    <Box position="relative" w="100vw" maxW="1000px" mt={10} border="2px solid #38b6ff" borderRadius="lg" p={8}>
+      {/* Loading Overlay */}
+      {loading && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg="blackAlpha.600"
+          backdropFilter="blur(10px)"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          zIndex="9999"
+        >
+          <VStack spacing={4}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+            <Text fontSize="lg" color="white" fontWeight="bold">
+              Generating Rules...
+            </Text>
+          </VStack>
+        </Box>
+      )}
+
       <Button variant="ghost" mb={4} onClick={onBack}>
         ← Back to Templates
       </Button>
@@ -166,13 +198,9 @@ const Upload: React.FC<UploadProps> = ({
         </VStack>
       </Box>
       <Flex justify="flex-end">
-        {loading ? 
-        <Text fontSize="lg" color="blue.600" fontWeight="bold">
-          Generating Rules...
-        </Text>
-        :<Button colorScheme="blue" size="lg" onClick={handleContinue}>
+        <Button colorScheme="blue" size="lg" onClick={handleContinue} isDisabled={loading}>
           Continue
-        </Button>}
+        </Button>
       </Flex>
     </Box>
   );

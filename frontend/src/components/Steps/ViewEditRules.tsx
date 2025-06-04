@@ -5,8 +5,10 @@ import {
   Flex,
   HStack,
   Spacer,
+  Spinner,
   Text,
-  useToast
+  useToast,
+  VStack
 } from '@chakra-ui/react';
 import React from 'react';
 import { ColumnMappingsResponse, Rule } from '../../lib/prompt';
@@ -95,6 +97,37 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, step, setStep, onC
   };
 
   return (
+    <>
+    {/* Loading Overlay */}
+    {loading && (
+      <Box
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        bg="blackAlpha.600"
+        backdropFilter="blur(10px)"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        zIndex="9999"
+      >
+        <VStack spacing={4}>
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+          <Text fontSize="lg" color="white" fontWeight="bold">
+            Generating Preview...
+          </Text>
+        </VStack>
+      </Box>
+    )}
+
     <Box>
     <Box w="100%" maxW="1200px" mx="auto" mt={8} border="2px solid #38b6ff" borderRadius="lg" p={6}>
       <Text fontSize="2xl" fontWeight="bold" mb={1}>
@@ -196,15 +229,12 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, step, setStep, onC
         <Button variant="outline" onClick={() => setStep(step - 1)}>
           ← Back to Upload
         </Button>
-       {loading ? 
-        <Button colorScheme="blue" disabled>
-          Generating Preview...
-        </Button>
-       :<Button colorScheme="blue" onClick={handleContinue}>
+       <Button colorScheme="blue" onClick={handleContinue}>
           Continue to Preview →
-        </Button>}
+        </Button>
       </Flex>
     </Box>
+    </>
   );
 };
 

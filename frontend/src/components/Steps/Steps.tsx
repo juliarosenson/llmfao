@@ -129,6 +129,8 @@ const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
           onBack={() => setStep(2)}
           onSave={() => {/* handle save */}}
           originalData={STUB_DONATION_DATA}
+          templateName={templateName || ''}
+          fileNamePattern={fileNamePattern}
         />}
       </Box>
     </Flex>
