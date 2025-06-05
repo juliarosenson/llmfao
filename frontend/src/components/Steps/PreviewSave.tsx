@@ -79,10 +79,12 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
             borderRadius="md"
             bg="white"
             overflowX="auto"
+            overflowY="auto"
             maxW="100%"
+            maxH="300px"
           >
             <Table size="sm" minW="600px">
-              <Thead bg="gray.50">
+              <Thead bg="gray.50" position="sticky" top={0} zIndex={1}>
                 <Tr>
                   {Object.keys(originalData[0] || {}).map((key) => (
                     <Th key={key} fontSize="xs" color="gray.600" whiteSpace="nowrap">
@@ -122,10 +124,12 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
             borderRadius="md"
             bg="white"
             overflowX="auto"
+            overflowY="auto"
             maxW="100%"
+            maxH="300px"
           >
             <Table size="sm" minW="600px">
-              <Thead bg="gray.50">
+              <Thead bg="gray.50" position="sticky" top={0} zIndex={1}>
                 <Tr>
                 {Object.keys(previewData[0] || {}).map((key) => (
                     <Th key={key} fontSize="xs" color="gray.600" whiteSpace="nowrap">

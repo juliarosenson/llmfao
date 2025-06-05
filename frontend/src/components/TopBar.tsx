@@ -3,9 +3,9 @@ import { CheckIcon } from '@chakra-ui/icons';
 import React from 'react';
 
 const steps = [
-  "1. File Set Up",
-  "2. Review Rules",
-  "3. Preview & Save"
+  "File Set Up",
+  "Review Rules",
+  "Preview & Save"
 ];
 
 interface TopBarProps {
