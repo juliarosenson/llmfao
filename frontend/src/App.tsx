@@ -1,18 +1,16 @@
-import { ChakraProvider, Container, Heading, VStack } from '@chakra-ui/react';
+import { Box, ChakraProvider } from '@chakra-ui/react';
 import { useState } from 'react';
-import TopBar from './components/TopBar';
 import Steps from './components/Steps/Steps';
+import TopBar from './components/TopBar';
 
 function App() {
   const [step, setStep] = useState(1);
   return (
     <ChakraProvider>
-      <Container maxW="container.md" py={10}>
-        <VStack spacing={8} align="center">
-          <TopBar currentStep={step} />
-          <Steps step={step} setStep={setStep}/>
-        </VStack>
-      </Container>
+      <TopBar currentStep={step} />
+      <Box ml="280px" p={8}>
+        <Steps step={step} setStep={setStep}/>
+      </Box>
     </ChakraProvider>
   );
 }

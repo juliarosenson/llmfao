@@ -3,7 +3,10 @@ import {
   Box,
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   HStack,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,22 +14,16 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spacer,
+  Select,
   Spinner,
   Text,
+  Textarea,
   useDisclosure,
   useToast,
-  VStack,
-  Grid,
-  GridItem,
-  Select,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea
+  VStack
 } from '@chakra-ui/react';
 import React from 'react';
-import { ColumnMappingsResponse, ColumnMapping } from '../../lib/prompt';
+import { ColumnMapping, ColumnMappingsResponse } from '../../lib/prompt';
 
 interface ViewEditRulesProps {
   rules?: ColumnMappingsResponse["columnMappings"];
@@ -144,6 +141,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
   const [transformationLogic, setTransformationLogic] = React.useState<string>('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const rulesContainerRef = React.useRef<HTMLDivElement>(null);
   
   if (!rules) {
     return (
@@ -206,12 +204,8 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
           }
           break;
         case 'Extract':
-          updatedSourceFields = [selectedSourceField];
-          if (transformationLogic.trim()) {
-            updatedTransformationLogic = transformationLogic;
-          } else {
-            updatedTransformationLogic = `Extract portion from ${selectedSourceField}`;
-          }
+          updatedSourceFields = selectedSourceFields;
+          updatedTransformationLogic = `Extract portions from ${selectedSourceFields.join(', ')}`;
           break;
         case 'Blank':
           updatedSourceFields = [];
@@ -219,7 +213,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
           break;
         default:
           updatedSourceFields = [selectedSourceField];
-          updatedTransformationLogic = `Process ${selectedSourceField} for ${editingMapping.target_column}`;
+          updatedTransformationLogic = `Process ${selectedSourceField} into ${editingMapping.target_column}`;
       }
 
       const updatedMapping: ColumnMapping = {
@@ -227,6 +221,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
         type: selectedRuleType as ColumnMapping['type'],
         source_fields: updatedSourceFields,
         transformation_logic: updatedTransformationLogic,
+        needs_attention: false,
       };
 
       console.log('Applying changes:', {
@@ -240,6 +235,16 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
       
       setRules(updatedRules);
       
+      // Close modal first to prevent focus issues
+      onClose();
+      
+      // Scroll to top of rules container after React re-render
+      setTimeout(() => {
+        if (rulesContainerRef.current) {
+          rulesContainerRef.current.scrollTop = 0;
+        }
+      }, 100);
+      
       toast({
         title: 'Mapping updated successfully',
         status: 'success',
@@ -247,7 +252,6 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
         isClosable: true,
       });
     }
-    onClose();
   };
 
   const handleContinue = async () => {
@@ -285,6 +289,18 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
               placeholder="Enter the value to use for all rows"
               bg="white"
               borderColor="gray.300"
+            />
+            
+            <FormLabel fontSize="sm" fontWeight="600" color="gray.700" mt={4}>
+              Logic
+            </FormLabel>
+            <Textarea
+              value={transformationLogic}
+              onChange={(e) => setTransformationLogic(e.target.value)}
+              placeholder="Describe the transformation logic"
+              bg="white"
+              borderColor="gray.300"
+              minH="60px"
             />
           </FormControl>
         );
@@ -391,6 +407,20 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
                 borderColor="gray.300"
               />
             </FormControl>
+
+            <FormControl>
+              <FormLabel fontSize="sm" fontWeight="600" color="gray.700">
+                Logic
+              </FormLabel>
+              <Textarea
+                value={transformationLogic}
+                onChange={(e) => setTransformationLogic(e.target.value)}
+                placeholder="Describe the transformation logic"
+                bg="white"
+                borderColor="gray.300"
+                minH="60px"
+              />
+            </FormControl>
           </VStack>
         );
       
@@ -399,13 +429,21 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
           <VStack spacing={4} mt={4}>
             <FormControl>
               <FormLabel fontSize="sm" fontWeight="600" color="gray.700">
-                Source Field
+                Source Fields
               </FormLabel>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Select one or more fields to extract from (hold Ctrl/Cmd to select multiple)
+              </Text>
               <Select
-                value={selectedSourceField}
-                onChange={(e) => setSelectedSourceField(e.target.value)}
+                multiple
+                value={selectedSourceFields}
+                onChange={(e) => {
+                  const values = Array.from(e.target.selectedOptions, option => option.value);
+                  setSelectedSourceFields(values);
+                }}
                 bg="white"
                 borderColor="gray.300"
+                minH="120px"
                 _hover={{ borderColor: "gray.400" }}
                 _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #3182ce" }}
               >
@@ -415,6 +453,20 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
                   </option>
                 ))}
               </Select>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontSize="sm" fontWeight="600" color="gray.700">
+                Logic
+              </FormLabel>
+              <Textarea
+                value={transformationLogic}
+                onChange={(e) => setTransformationLogic(e.target.value)}
+                placeholder="Describe what part to extract (e.g., Extract first letter of first name and first letter of last name from Donor Name field, concatenate with no space)"
+                bg="white"
+                borderColor="gray.300"
+                minH="80px"
+              />
             </FormControl>
           </VStack>
         );
@@ -488,13 +540,18 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
       </Box>
     )}
 
-    <Box>
-    <Box w="100%" maxW="1200px" mx="auto" mt={8} border="2px solid #38b6ff" borderRadius="lg" p={6}>
+    <Box w="100%" maxW="1400px">
+    <Box w="100%" mx="auto" mt={8} border="2px solid #38b6ff" borderRadius="lg" p={6}>
       <Text fontSize="xl" fontWeight="bold" mb={1}>
         Review Column Mappings
       </Text>
       <Text color="gray.600" mb={4}>
         AI has analyzed your data and generated transformation rules
+        {rules.filter(r => r.needs_attention).length > 0 && (
+          <Text as="span" color="red.600" fontWeight="bold" ml={2}>
+            • {rules.filter(r => r.needs_attention).length} rule{rules.filter(r => r.needs_attention).length === 1 ? '' : 's'} need{rules.filter(r => r.needs_attention).length === 1 ? 's' : ''} review
+          </Text>
+        )}
       </Text>
       
       {/* Rule Type Stats */}
@@ -506,31 +563,31 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
           <Text fontSize="xs" color="gray.500">COPY</Text>
         </Box>
         <Box>
-          <Text fontSize="lg" fontWeight="bold" color="orange.600">
+          <Text fontSize="lg" fontWeight="bold" color="blue.600">
             {rules.filter(r => r.type === 'Reformat').length}
           </Text>
           <Text fontSize="xs" color="gray.500">REFORMAT</Text>
         </Box>
         <Box>
-          <Text fontSize="lg" fontWeight="bold" color="purple.600">
+          <Text fontSize="lg" fontWeight="bold" color="blue.600">
             {rules.filter(r => r.type === 'Concatenate').length}
           </Text>
           <Text fontSize="xs" color="gray.500">CONCATENATE</Text>
         </Box>
         <Box>
-          <Text fontSize="lg" fontWeight="bold" color="yellow.600">
+          <Text fontSize="lg" fontWeight="bold" color="blue.600">
             {rules.filter(r => r.type === 'Extract').length}
           </Text>
           <Text fontSize="xs" color="gray.500">EXTRACT</Text>
         </Box>
         <Box>
-          <Text fontSize="lg" fontWeight="bold" color="green.600">
+          <Text fontSize="lg" fontWeight="bold" color="blue.600">
             {rules.filter(r => r.type === 'Static').length}
           </Text>
           <Text fontSize="xs" color="gray.500">STATIC</Text>
         </Box>
         <Box>
-          <Text fontSize="lg" fontWeight="bold" color="red.600">
+          <Text fontSize="lg" fontWeight="bold" color="blue.600">
             {rules.filter(r => r.type === 'Blank').length}
           </Text>
           <Text fontSize="xs" color="gray.500">BLANK</Text>
@@ -549,9 +606,10 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
         borderRadius="lg"
         p={4}
         mb={6}
+        ref={rulesContainerRef}
       >
         {autoMappings
-          // .sort((a, b) => a.target_column.localeCompare(b.target_column))
+          .sort((a, b) => a.target_column.localeCompare(b.target_column))
           .map((mapping, idx) => {
             const ruleType = getRuleTypeLabel(mapping);
             const hasRule = !!mapping.type;
@@ -565,7 +623,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
                 p={5}
                 mb={4}
                 border="2px solid"
-                borderColor={hasRule ? "gray.200" : "red.300"}
+                borderColor={mapping.needs_attention ? "red.300" : (hasRule ? "gray.200" : "red.300")}
                 _last={{ mb: 0 }}
               >
                 <Flex align="flex-start" mb={3}>
@@ -574,7 +632,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
                       <Text fontWeight="bold" fontSize="lg">{mapping.target_column}</Text>
                       {hasRule && ruleType ? (
                         <Badge 
-                          colorScheme={getRuleTypeColor(ruleType.label)} 
+                          colorScheme="blue" 
                           fontSize="xs" 
                           px={2} 
                           py={1}
@@ -611,16 +669,29 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
                     )}
                   </Box>
                   
-                  <Button 
-                    size="sm" 
-                    variant={hasRule ? "outline" : "solid"}
-                    colorScheme={hasRule ? "gray" : "blue"}
-                    onClick={() => handleEditClick(mapping)}
-                    ml={4}
-                    flexShrink={0}
-                  >
-                    Edit
-                  </Button>
+                  <HStack spacing={2}>
+                    {mapping.needs_attention && (
+                      <Badge 
+                        colorScheme="red" 
+                        fontSize="xs" 
+                        px={3} 
+                        py={1}
+                        borderRadius="full"
+                        fontWeight="bold"
+                      >
+                        Needs Review
+                      </Badge>
+                    )}
+                    <Button 
+                      size="sm" 
+                      variant={hasRule ? "outline" : "solid"}
+                      colorScheme={hasRule ? "gray" : "blue"}
+                      onClick={() => handleEditClick(mapping)}
+                      flexShrink={0}
+                    >
+                      Edit
+                    </Button>
+                  </HStack>
                 </Flex>
               </Box>
             );
@@ -678,21 +749,6 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({ rules, setRules, step, se
 
           {/* Rule-specific Configuration */}
           {renderRuleConfiguration()}
-
-          {/* Notes */}
-          <FormControl mt={4}>
-            <FormLabel fontSize="sm" fontWeight="600" color="gray.700">
-              Logic
-            </FormLabel>
-            <Textarea
-              value={transformationLogic}
-              onChange={(e) => setTransformationLogic(e.target.value)}
-              placeholder="Any additional notes or assumptions"
-              bg="white"
-              borderColor="gray.300"
-              minH="60px"
-            />
-          </FormControl>
           
         </ModalBody>
 

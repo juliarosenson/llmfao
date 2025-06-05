@@ -29,8 +29,6 @@ interface PreviewAndSaveProps {
 }
 
 const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, previewData, originalData, templateName, fileNamePattern }) => {
-  const colsWithRules = rules.filter(mapping => mapping.type);
-  
   return (
     <Box w="100%" maxW="1400px" mx="auto" p={6}>
       {/* Header */}
@@ -73,7 +71,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
         {/* Original Data Table */}
         <Box flex="1">
           <Text fontSize="lg" fontWeight="semibold" mb={4} color="gray.700">
-            📊 Original Donation Data
+            Original Donation Data
           </Text>
           <Box
             border="1px solid"
@@ -116,7 +114,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
         {/* Transformed Data Table */}
         <Box flex="1">
           <Text fontSize="lg" fontWeight="semibold" mb={4} color="gray.700">
-            🎯 Transformed CRM Format
+            Transformed CRM Format
           </Text>
           <Box
             border="1px solid"

@@ -105,7 +105,7 @@ const Upload: React.FC<UploadProps> = ({
   };
 
   return (
-    <Box position="relative" w="100vw" maxW="1000px" mt={10} border="2px solid #38b6ff" borderRadius="lg" p={8}>
+    <Box position="relative" w="100%" maxW="1600px" mt={10} border="2px solid #38b6ff" borderRadius="lg" p={8}>
       {/* Loading Overlay */}
       {loading && (
         <Box

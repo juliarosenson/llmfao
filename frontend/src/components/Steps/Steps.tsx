@@ -68,7 +68,7 @@ const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
 
   return (
     <Flex>
-      <Box w="100%" p={8}>
+      <Box w="100%" maxW={"1600px"} p={8}>
         {step === 1 && (
           <Upload
             setTemplateName={setTemplateName}
