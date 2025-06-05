@@ -1,56 +1,15 @@
-import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
-import TopBar from '../TopBar';
-import Upload from './Upload';
-import ViewEditRules from './ViewEditRules';
+import React from 'react';
 import { ColumnMappingsResponse, submitFinalExportPrompt, submitPromptWithFile } from '../../lib/prompt';
 import PreviewAndSave from './PreviewSave';
-
-const STUB_DONATION_DATA = [
-  {
-    name: 'Mr. Joel and Mrs. June Smith',
-    amount: '$100',
-    purpose: 'In honor of Dave Johnson',
-    userId: '123',
-    email: 'joel@email.com',
-    fund: 'The Donors Fund',
-    opportunityId: 'opp123',
-    accountId: 'acc123',
-    accountName: 'Smith Family Foundation',
-    address: '123 Main St',
-    address2: 'Apt 4B',
-    city: 'Springfield',
-    state: 'IL',
-    zip: '62701',
-    country: 'USA',
-    phone: '(555) 123-4567',
-    createdAt: '2024-01-15T10:00:00Z',    
-  },
-  {
-    name: 'Ms. Jane Doe',
-    amount: '$250',
-    purpose: 'In memory of John Doe',
-    userId: '456',
-    email: 'example@give.com',
-    fund: 'Community Fund',
-    opportunityId: 'opp456',
-    accountId: 'acc456',
-    accountName: 'Doe Family Trust',
-    address: '456 Elm St',
-    address2: '',
-    city: 'Shelbyville',
-    state: 'IL',
-    zip: '62565',
-    country: 'USA',
-    phone: '(555) 987-6543',
-    createdAt: '2024-01-16T11:30:00Z', 
-  }
-];
+import Upload from './Upload';
+import ViewEditRules from './ViewEditRules';
+import { CHARIOT_DATA } from '../../data/chariot_data';
 
 export type Template = {
   name: string;
   fileNamePattern: string;
-  rules: ColumnMappingsResponse;
+  rules: ColumnMappingsResponse["columnMappings"];
 }
 
 interface StepsProps {
@@ -60,11 +19,11 @@ interface StepsProps {
 
 const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
   // State for rules
-  const [rules, setRules] = React.useState<ColumnMappingsResponse>();
+  const [rules, setRules] = React.useState<ColumnMappingsResponse["columnMappings"]>();
   const [templateName, setTemplateName] = React.useState<string>()
   const [crmFile, setCrmFile] = React.useState<File | null>(null);
   const [fileNamePattern, setFileNamePattern] = React.useState<string>('export_Start Date_End Date');
-  const [csvPreview, setCsvPreview] = React.useState<string>('');
+  const [previewData, setPreviewData] = React.useState<Record<string, any>[]>([]);
 
   // Handler for going back from Upload
   const handleBack = () => {
@@ -78,11 +37,12 @@ const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
       return;
     }
 
-    const rules = await submitPromptWithFile(
-      JSON.stringify(STUB_DONATION_DATA),
+    const res = await submitPromptWithFile(
+      JSON.stringify(CHARIOT_DATA),
       await crmFile.text(),
     )
-    setRules(rules);
+    console.log('Generated res:', res);
+    setRules(res.columnMappings);
     setStep(step + 1);
   };
 
@@ -95,10 +55,14 @@ const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
 
     const res = await submitFinalExportPrompt(
       rules,
-      JSON.stringify(STUB_DONATION_DATA.slice(0, 3)),
+      JSON.stringify(CHARIOT_DATA),
     )
-    console.log('Final export response:', res);
-    setCsvPreview(res);
+
+    const data = JSON.parse(res);
+    console.log('Final export data:', data);
+
+
+    setPreviewData(data);
     setStep(step + 1);
   };
 
@@ -119,16 +83,18 @@ const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
         )}
         {step === 2 && <ViewEditRules 
         rules={rules} 
+        setRules={setRules}
         step={step} 
         setStep={setStep}
         onContinue={handlePreview}
+        sourceFields={Object.keys(CHARIOT_DATA[0])}
          />}
         {step === 3 && rules && <PreviewAndSave
           rules={rules}
-          csvPreview={csvPreview}
+          previewData={previewData}
           onBack={() => setStep(2)}
           onSave={() => {/* handle save */}}
-          originalData={STUB_DONATION_DATA}
+          originalData={CHARIOT_DATA}
           templateName={templateName || ''}
           fileNamePattern={fileNamePattern}
         />}

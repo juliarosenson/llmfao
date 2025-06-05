@@ -19,8 +19,8 @@ import { ColumnMappingsResponse } from '../../lib/prompt';
 
 
 interface PreviewAndSaveProps {
-  rules: ColumnMappingsResponse;
-  csvPreview: string;
+  rules: ColumnMappingsResponse["columnMappings"];
+  previewData: Record<string, any>[];
   originalData: Record<string, any>[];
   templateName: string;
   fileNamePattern: string;
@@ -28,9 +28,8 @@ interface PreviewAndSaveProps {
   onSave: () => void;
 }
 
-const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, csvPreview, originalData, templateName, fileNamePattern }) => {
-  const colsWithRules = rules.filter(mapping => mapping.rule);
-  const csvRows = csvPreview.split('\n').map(row => row.split(','));
+const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, previewData, originalData, templateName, fileNamePattern }) => {
+  const colsWithRules = rules.filter(mapping => mapping.type);
   
   return (
     <Box w="100%" maxW="1400px" mx="auto" p={6}>
@@ -39,22 +38,35 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
         Preview & Save Template
       </Text>
 
-      {/* Success Banner */}
-      {colsWithRules.length === rules.length && (<Box
-        bg="green.50"
+      {/* Template Summary */}
+      <Box
         border="1px solid"
-        borderColor="green.200"
+        borderColor="blue.200"
         borderRadius="md"
-        p={4}
+        p={6}
         mb={8}
       >
-        <HStack>
-          <CheckCircleIcon color="green.500" boxSize={5} />
-          <Text color="green.700" fontWeight="medium">
-            All mapping rules configured! Ready to transform your data.
-          </Text>
+        <HStack align="flex-start" spacing={4}>
+          <VStack align="flex-start" spacing={2}>
+          <HStack align="flex-start" spacing={4}>
+            <Text fontWeight="bold" color="blue.700" fontSize="lg">
+            Template:
+            </Text>
+            <Text color="blue.700" fontSize="lg">
+            {templateName}
+            </Text>
+          </HStack>
+          <HStack align="flex-start" spacing={4}>
+            <Text fontWeight="bold" color="blue.700" fontSize="lg">
+            Output file name pattern:
+            </Text>
+            <Text color="blue.700" fontSize="lg">
+            {fileNamePattern}
+            </Text>
+          </HStack>
+          </VStack>
         </HStack>
-      </Box>)}
+      </Box>
 
       {/* Data Tables */}
       <VStack spacing={8} mb={8} align="stretch">
@@ -86,7 +98,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
                   <Tr key={index}>
                     {Object.values(row).map((value, cellIndex) => (
                       <Td key={cellIndex} fontSize="sm" whiteSpace="nowrap">
-                        {String(value)}
+                        {value? String(value): "-"}
                       </Td>
                     ))}
                   </Tr>
@@ -117,19 +129,19 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
             <Table size="sm" minW="600px">
               <Thead bg="gray.50">
                 <Tr>
-                  {csvRows[0]?.map((col, index) => (
-                    <Th key={index} fontSize="xs" color="gray.600" whiteSpace="nowrap">
-                      {col}
+                {Object.keys(previewData[0] || {}).map((key) => (
+                    <Th key={key} fontSize="xs" color="gray.600" whiteSpace="nowrap">
+                      {key}
                     </Th>
                   ))}
                 </Tr>
               </Thead>
               <Tbody>
-                {csvRows.slice(1, csvRows.length).map((row, index) => (
+              {previewData.map((row, index) => (
                   <Tr key={index}>
-                    {row.map((cell, cellIndex) => (
+                    {Object.values(row).map((value, cellIndex) => (
                       <Td key={cellIndex} fontSize="sm" whiteSpace="nowrap">
-                        {cell}
+                        {value? String(value): "-"}
                       </Td>
                     ))}
                   </Tr>
@@ -139,31 +151,6 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({ rules, onBack, onSave, 
           </Box>
         </Box>
       </VStack>
-
-      {/* Template Summary */}
-      <Box
-        bg="blue.50"
-        border="1px solid"
-        borderColor="blue.200"
-        borderRadius="md"
-        p={6}
-        mb={8}
-      >
-        <HStack align="flex-start" spacing={4}>
-          <CheckCircleIcon color="blue.500" boxSize={6} mt={1} />
-          <VStack align="flex-start" spacing={2}>
-            <Text fontWeight="bold" color="blue.700" fontSize="lg">
-              Template Summary
-            </Text>
-            <VStack align="flex-start" spacing={1} color="blue.600">
-              <Text fontSize="sm">• Template: {templateName}</Text>
-              <Text fontSize="sm">• File pattern: {fileNamePattern}</Text>
-              <Text fontSize="sm">• {colsWithRules.length} transformation rules created</Text>
-              <Text fontSize="sm">• {rules.length - colsWithRules.length} field mappings unresolved</Text>
-            </VStack>
-          </VStack>
-        </HStack>
-      </Box>
 
       {/* Action Buttons */}
       <Flex justify="center" gap={4}>

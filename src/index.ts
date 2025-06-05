@@ -47,22 +47,43 @@ app.post('/api/generate', upload.array('file'), async (req, res) => {
     
     // Clean up markdown code block formatting
     let cleanedResponse = completion.choices[0].message.content || '';
-    cleanedResponse = cleanedResponse.replace(/^```(json|csv)\s*/, '').replace(/\s*```$/, '');
+    cleanedResponse = cleanedResponse.replace(/^```(json|csv|plaintext)\s*/, '').replace(/\s*```$/, '');
+    
+    console.log('Cleaned response:', cleanedResponse);
     
     res.json({
       response: cleanedResponse,
     });
 
     // // Use Claude's format:
-    // const completion = await anthropic.messages.create({
-    //     model: "claude-3-5-sonnet-20241022", // or claude-3-haiku-20240307, claude-3-opus-20240229
+    // const stream = await anthropic.messages.create({
+    //     model: "claude-sonnet-4-0", // or claude-3-haiku-20240307, claude-3-opus-20240229
     //     max_tokens: 1000,
-    //     messages: [{ role: "user", content: prompt }]
+    //     messages: [{ role: "user", content: prompt }],
+    //     stream: true
     // });
 
+
+
+    // let fullResponse = '';
+    // for await (const chunk of stream) {
+    //   switch (chunk.type) {
+    //     case 'content_block_delta':
+    //       if (chunk.delta.type === 'text_delta') {
+    //         fullResponse += chunk.delta.text;
+    //       }
+    //       break;
+    //     case 'message_stop':
+    //       console.log('Stream ended');
+    //       break;
+    //   }
+    // }
+
+
+    // console.log('Anthropic response:', fullResponse);
+
     // res.json({
-    //   response: completion.content[0].type === 'text' ? completion.content[0].text : '',
-    //   filesProcessed: files ? files.length : 0
+    //   response: fullResponse,
     // });
   } catch (error) {
     console.error('Error:', error);

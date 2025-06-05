@@ -10,7 +10,8 @@ import {
   Text,
   useToast,
   VStack,
-  Spinner
+  Spinner,
+  Select
 } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 
@@ -65,6 +66,17 @@ const Upload: React.FC<UploadProps> = ({
       if (!crmFile) {
         toast({
           title: 'Please upload your CRM export sample.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!templateName) {
+        toast({
+          title: 'Please enter a template name.',
           status: 'error',
           duration: 3000,
           isClosable: true,
@@ -152,12 +164,32 @@ const Upload: React.FC<UploadProps> = ({
         </FormControl>
       </HStack>
       <Box mb={2} mt={8}>
-        <Text fontWeight="bold" fontSize="lg">
-          Upload your CRM export sample
+        <Text fontWeight="bold" fontSize="xl">
+          Upload a CRM sample
         </Text>
         <Text color="gray.500" fontSize="md" mb={4}>
-          Upload an example export from your CRM so we can match the format you need
+          Upload a csv of the data you upload to your CRM so we can match the format you need
         </Text>
+        
+        <FormControl mb={4} maxW="300px">
+          <FormLabel fontSize="sm" fontWeight="600" color="gray.700">
+            CRM Provider
+          </FormLabel>
+          <Select
+            placeholder="Select your CRM provider"
+            bg="white"
+            borderColor="gray.300"
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #3182ce" }}
+          >
+            <option value="salesforce">Salesforce</option>
+            <option value="raisers-edge">Raiser's Edge</option>
+            <option value="virtuous">Virtuous</option>
+            <option value="admire">Admire</option>
+            <option value="everyaction">EveryAction</option>
+            <option value="other">Other</option>
+          </Select>
+        </FormControl>
       </Box>
       <Box
         border="2px dashed #cbd5e1"
