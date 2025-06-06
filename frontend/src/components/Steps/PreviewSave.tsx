@@ -71,7 +71,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
           _hover={{ textDecoration: "underline" }}
         >
           <Text mr="8px">←</Text>
-          Back to Templates
+          Back
         </Button>
 
         {/* Page Title */}
@@ -136,7 +136,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
             overflow="auto"
             mb="8px"
           >
-            <Table size="sm" fontSize="13px">
+            <Table size="sm" fontSize="13px" sx={{ tableLayout: "auto" }}>
               <Thead>
                 <Tr bg="#F8FAFB">
                   {Object.keys(originalData[0] || {}).map((key) => (
@@ -150,8 +150,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
                       textTransform="uppercase"
                       letterSpacing="0.5px"
                       whiteSpace="nowrap"
-                      overflow="hidden"
-                      textOverflow="ellipsis"
+                      minW="120px"
                     >
                       {key}
                     </Th>
@@ -172,9 +171,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
                         borderBottom="1px solid #F6F8FA"
                         color="#333"
                         whiteSpace="nowrap"
-                        overflow="hidden"
-                        textOverflow="ellipsis"
-                        maxW="200px"
+                        minW="120px"
                       >
                         {value ? String(value) : "-"}
                       </Td>
@@ -207,7 +204,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
             overflow="auto"
             mb="8px"
           >
-            <Table size="sm" fontSize="13px">
+            <Table size="sm" fontSize="13px" sx={{ tableLayout: "auto" }}>
               <Thead>
                 <Tr bg="#F8FAFB">
                   {Object.keys(previewData[0] || {}).map((key) => (
@@ -221,8 +218,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
                       textTransform="uppercase"
                       letterSpacing="0.5px"
                       whiteSpace="nowrap"
-                      overflow="hidden"
-                      textOverflow="ellipsis"
+                      minW="120px"
                     >
                       {key}
                     </Th>
@@ -243,9 +239,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
                         borderBottom="1px solid #F6F8FA"
                         color="#333"
                         whiteSpace="nowrap"
-                        overflow="hidden"
-                        textOverflow="ellipsis"
-                        maxW="200px"
+                        minW="120px"
                       >
                         {value ? String(value) : "-"}
                       </Td>

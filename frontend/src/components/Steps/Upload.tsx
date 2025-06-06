@@ -195,7 +195,7 @@ const Upload: React.FC<UploadProps> = ({
             _hover={{ textDecoration: "underline" }}
           >
             <Text mr="8px">←</Text>
-            Back to Templates
+            Back
           </Button>
 
           {/* Page Title */}
@@ -235,7 +235,7 @@ const Upload: React.FC<UploadProps> = ({
                 <Input
                   value={templateName}
                   onChange={e => setTemplateName(e.target.value)}
-                  placeholder="Testing"
+                  placeholder="Template Name"
                   p="14px 16px"
                   border="1px solid #DBE0E5"
                   borderRadius="8px"

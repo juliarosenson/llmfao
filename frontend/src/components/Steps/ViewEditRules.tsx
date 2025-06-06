@@ -2,6 +2,8 @@ import {
   Badge,
   Box,
   Button,
+  Checkbox,
+  CheckboxGroup,
   Flex,
   FormControl,
   FormLabel,
@@ -16,6 +18,7 @@ import {
   ModalOverlay,
   Select,
   Spinner,
+  Stack,
   Text,
   Textarea,
   useDisclosure,
@@ -124,6 +127,59 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
   const toast = useToast();
   const rulesContainerRef = React.useRef<HTMLDivElement>(null);
 
+  // Function to auto-update transformation logic based on rule type and source fields
+  const updateTransformationLogic = React.useCallback(() => {
+    if (!editingMapping || !selectedRuleType) return;
+
+    let newTransformationLogic = '';
+
+    switch (selectedRuleType) {
+      case 'Copy':
+        if (selectedSourceField) {
+          newTransformationLogic = `Copy ${selectedSourceField} directly to ${editingMapping.target_column}`;
+        }
+        break;
+      case 'Concatenate':
+        if (selectedSourceFields.length > 0) {
+          newTransformationLogic = `Combine ${selectedSourceFields.join(', ')} with separator "${separatorValue}"`;
+        }
+        break;
+      case 'Static':
+        if (hardcodeValue) {
+          newTransformationLogic = `Set to static value: "${hardcodeValue}"`;
+        }
+        break;
+      case 'Reformat':
+        if (selectedSourceField) {
+          if (reformatType) {
+            newTransformationLogic = `Convert ${selectedSourceField} to ${reformatType} format`;
+          } else {
+            newTransformationLogic = `Reformat ${selectedSourceField} for ${editingMapping.target_column}`;
+          }
+        }
+        break;
+      case 'Extract':
+        if (selectedSourceFields.length > 0) {
+          newTransformationLogic = `Extract portions from ${selectedSourceFields.join(', ')}`;
+        }
+        break;
+      case 'Blank':
+        newTransformationLogic = `Leave ${editingMapping.target_column} blank`;
+        break;
+      default:
+        if (selectedSourceField) {
+          newTransformationLogic = `Process ${selectedSourceField} into ${editingMapping.target_column}`;
+        }
+    }
+
+    setTransformationLogic(newTransformationLogic);
+  }, [editingMapping, selectedRuleType, selectedSourceField, selectedSourceFields, separatorValue, hardcodeValue, reformatType]);
+
+  // Auto-update transformation logic when relevant fields change
+  React.useEffect(() => {
+    updateTransformationLogic();
+  }, [updateTransformationLogic]);
+
   if (!rules) {
     return (
       <Box p={8}>
@@ -161,53 +217,50 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
   const handleApplyChanges = () => {
     if (editingMapping) {
       let updatedSourceFields: string[] = [];
-      let updatedTransformationLogic = '';
 
       switch (selectedRuleType) {
         case 'Copy':
           updatedSourceFields = [selectedSourceField];
-          updatedTransformationLogic = `Copy ${selectedSourceField} directly to ${editingMapping.target_column}`;
           break;
         case 'Concatenate':
           updatedSourceFields = selectedSourceFields;
-          updatedTransformationLogic = `Combine ${selectedSourceFields.join(', ')} with separator "${separatorValue}"`;
           break;
         case 'Static':
           updatedSourceFields = [];
-          updatedTransformationLogic = `Set to static value: "${hardcodeValue}"`;
           break;
         case 'Reformat':
           updatedSourceFields = [selectedSourceField];
-          if (reformatType) {
-            updatedTransformationLogic = `Convert ${selectedSourceField} to ${reformatType} format`;
-          } else {
-            updatedTransformationLogic = `Reformat ${selectedSourceField} for ${editingMapping.target_column}`;
-          }
           break;
         case 'Extract':
           updatedSourceFields = selectedSourceFields;
-          updatedTransformationLogic = `Extract portions from ${selectedSourceFields.join(', ')}`;
           break;
         case 'Blank':
           updatedSourceFields = [];
-          updatedTransformationLogic = `Leave ${editingMapping.target_column} blank`;
           break;
         default:
           updatedSourceFields = [selectedSourceField];
-          updatedTransformationLogic = `Process ${selectedSourceField} into ${editingMapping.target_column}`;
       }
+
+      console.log('Updated mapping:', {
+        ...editingMapping,
+        type: selectedRuleType,
+        source_fields: updatedSourceFields,
+        transformation_logic: transformationLogic,
+      });
 
       const updatedMapping: ColumnMapping = {
         ...editingMapping,
         type: selectedRuleType as ColumnMapping['type'],
         source_fields: updatedSourceFields,
-        transformation_logic: updatedTransformationLogic,
+        transformation_logic: transformationLogic,
         needs_attention: false,
       };
 
       const updatedRules = rules!.map((rule) =>
         rule.target_column === editingMapping.target_column ? updatedMapping : rule
       );
+
+      console.log('Updated rules:', updatedRules);
 
       setRules(updatedRules);
 
@@ -370,39 +423,61 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
                 Source Fields to Combine
               </FormLabel>
               <Text fontSize="12px" color="#666" mb={2}>
-                Select multiple fields to combine (hold Ctrl/Cmd to select multiple)
+                Select multiple fields to combine
               </Text>
-              <Select
-                multiple
-                value={selectedSourceFields}
-                onChange={(e) => {
-                  const values = Array.from(e.target.selectedOptions, option => option.value);
-                  setSelectedSourceFields(values);
-                }}
-                w="full"
+              <Flex justify="flex-end" mb={2}>
+                <Button
+                  variant="link"
+                  size="sm"
+                  color="#35BBF4"
+                  fontSize="12px"
+                  p={0}
+                  h="auto"
+                  mr={3}
+                  onClick={() => setSelectedSourceFields(getAllSourceFields())}
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Select All
+                </Button>
+                <Button
+                  variant="link"
+                  size="sm"
+                  color="#666"
+                  fontSize="12px"
+                  p={0}
+                  h="auto"
+                  onClick={() => setSelectedSourceFields([])}
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Unselect All
+                </Button>
+              </Flex>
+              <Box
                 border="1px solid #DBE0E5"
                 borderRadius="8px"
-                fontSize="14px"
+                p="12px"
                 bg="white"
-                minH="120px"
-                sx={{
-                  appearance: "none",
-                  backgroundImage: "none",
-                  "&::-webkit-appearance": "none",
-                  "&::-moz-appearance": "none"
-                }}
+                maxH="150px"
+                overflowY="auto"
                 _focus={{
                   outline: "none",
                   borderColor: "#35BBF4",
                   boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
                 }}
               >
-                {getAllSourceFields().map((field) => (
-                  <option key={field} value={field}>
-                    {field}
-                  </option>
-                ))}
-              </Select>
+                <CheckboxGroup
+                  value={selectedSourceFields}
+                  onChange={(values) => setSelectedSourceFields(values as string[])}
+                >
+                  <Stack spacing={2} direction="column">
+                    {getAllSourceFields().map((field) => (
+                      <Checkbox key={field} value={field}>
+                        {field}
+                      </Checkbox>
+                    ))}
+                  </Stack>
+                </CheckboxGroup>
+              </Box>
             </FormControl>
             
             <FormControl>
@@ -460,39 +535,61 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
                 Source Fields
               </FormLabel>
               <Text fontSize="12px" color="#666" mb={2}>
-                Select one or more fields to extract from (hold Ctrl/Cmd to select multiple)
+                Select one or more fields to extract from
               </Text>
-              <Select
-                multiple
-                value={selectedSourceFields}
-                onChange={(e) => {
-                  const values = Array.from(e.target.selectedOptions, option => option.value);
-                  setSelectedSourceFields(values);
-                }}
-                w="full"
+              <Flex justify="flex-end" mb={2}>
+                <Button
+                  variant="link"
+                  size="sm"
+                  color="#35BBF4"
+                  fontSize="12px"
+                  p={0}
+                  h="auto"
+                  mr={3}
+                  onClick={() => setSelectedSourceFields(getAllSourceFields())}
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Select All
+                </Button>
+                <Button
+                  variant="link"
+                  size="sm"
+                  color="#666"
+                  fontSize="12px"
+                  p={0}
+                  h="auto"
+                  onClick={() => setSelectedSourceFields([])}
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Unselect All
+                </Button>
+              </Flex>
+              <Box
                 border="1px solid #DBE0E5"
                 borderRadius="8px"
-                fontSize="14px"
+                p="12px"
                 bg="white"
-                minH="120px"
-                sx={{
-                  appearance: "none",
-                  backgroundImage: "none",
-                  "&::-webkit-appearance": "none",
-                  "&::-moz-appearance": "none"
-                }}
+                maxH="150px"
+                overflowY="auto"
                 _focus={{
                   outline: "none",
                   borderColor: "#35BBF4",
                   boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
                 }}
               >
-                {getAllSourceFields().map((field) => (
-                  <option key={field} value={field}>
-                    {field}
-                  </option>
-                ))}
-              </Select>
+                <CheckboxGroup
+                  value={selectedSourceFields}
+                  onChange={(values) => setSelectedSourceFields(values as string[])}
+                >
+                  <Stack spacing={2} direction="column">
+                    {getAllSourceFields().map((field) => (
+                      <Checkbox key={field} value={field}>
+                        {field}
+                      </Checkbox>
+                    ))}
+                  </Stack>
+                </CheckboxGroup>
+              </Box>
             </FormControl>
 
             <FormControl>
@@ -617,7 +714,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
           _hover={{ textDecoration: "underline" }}
         >
           <Text mr="8px">←</Text>
-          Back to Templates
+          Back
         </Button>
 
         {/* Page Title */}
@@ -711,7 +808,6 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
           {/* Rules List */}
           <VStack spacing="16px" align="stretch" mb="32px">
             {autoMappings
-              .sort((a, b) => a.target_column.localeCompare(b.target_column))
               .map((mapping) => {
                 const ruleType = getRuleTypeLabel(mapping);
                 const hasRule = !!mapping.type;

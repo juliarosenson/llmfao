@@ -134,7 +134,7 @@ Output Format
     "confidence_breakdown": {
       "high_confidence": 0,
       "medium_confidence": 0,
-      "low_confidence": 0,
+      "low_confidence": 0,q
       "needs_attention_count": 0
     },
     "review_required": []
