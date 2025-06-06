@@ -70,10 +70,12 @@ const Home: React.FC<HomeProps> = ({ onCreateTemplate }) => {
           Export Templates
         </Heading>
         <Button 
-          colorScheme="blue" 
+          bg="#12b4fa"
+          color="white"
           size="md"
           onClick={onCreateTemplate}
           leftIcon={<Text fontSize="lg">+</Text>}
+          _hover={{ bg: "#0ea5e9" }}
         >
           Create New Template
         </Button>
@@ -118,9 +120,11 @@ const Home: React.FC<HomeProps> = ({ onCreateTemplate }) => {
                 {/* Action Buttons */}
                 <HStack spacing={3}>
                   <Button 
-                    colorScheme="blue" 
+                    bg="#12b4fa"
+                    color="white"
                     size="sm"
                     onClick={onCreateTemplate}
+                    _hover={{ bg: "#0ea5e9" }}
                   >
                     Edit
                   </Button>
