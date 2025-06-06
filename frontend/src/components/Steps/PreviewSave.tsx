@@ -133,7 +133,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
           <Box
             border="1px solid #DBE0E5"
             borderRadius="8px"
-            overflow="hidden"
+            overflow="auto"
             mb="8px"
           >
             <Table size="sm" fontSize="13px">
@@ -204,7 +204,7 @@ const PreviewAndSave: React.FC<PreviewAndSaveProps> = ({
           <Box
             border="1px solid #DBE0E5"
             borderRadius="8px"
-            overflow="hidden"
+            overflow="auto"
             mb="8px"
           >
             <Table size="sm" fontSize="13px">

@@ -295,12 +295,12 @@ const Upload: React.FC<UploadProps> = ({
                   value={crmProvider}
                   onChange={e => setCrmProvider(e.target.value)}
                   placeholder="Select your CRM provider"
-                  p="14px 16px"
+                  w="full"
                   border="1px solid #DBE0E5"
                   borderRadius="8px"
                   fontSize="14px"
                   bg="white"
-                  w="100%"
+                  className="form-input"
                   _focus={{
                     outline: "none",
                     borderColor: "#35BBF4",

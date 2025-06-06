@@ -250,6 +250,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
     }
   };
 
+  // <FormLabel fontSize="14px" fontWeight="450" color="#333">
   const renderRuleConfiguration = () => {
     switch (selectedRuleType) {
       case 'Static':
@@ -261,7 +262,8 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
             <Input
               value={hardcodeValue}
               onChange={(e) => setHardcodeValue(e.target.value)}
-              placeholder="Enter the value to use for all rows"
+              placeholder="Enter the value or logic to use for all rows"
+              w="full"
               p="14px 16px"
               border="1px solid #DBE0E5"
               borderRadius="8px"
@@ -275,7 +277,249 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
             />
           </FormControl>
         );
+      
+      case 'Reformat':
+        return (
+          <VStack spacing={4} mt={4}>
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Source Field
+              </FormLabel>
+              <Select
+                value={selectedSourceField}
+                onChange={(e) => setSelectedSourceField(e.target.value)}
+                w="full"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              >
+                {getAllSourceFields().map((field) => (
+                  <option key={field} value={field}>
+                    {field}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Format Type
+              </FormLabel>
+              <Select
+                value={reformatType}
+                onChange={(e) => setReformatType(e.target.value)}
+                w="full"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              >
+                <option value="">Select format type</option>
+                <option value="date">Date</option>
+                <option value="phone">Phone Number</option>
+                <option value="currency">Currency</option>
+                <option value="other">Other</option>
+              </Select>
+            </FormControl>
 
+            {reformatType && (
+              <FormControl>
+                <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                  Format Pattern
+                </FormLabel>
+                <Input
+                  placeholder={
+                    reformatType === 'date' ? 'e.g., MM/DD/YYYY, YYYY-MM-DD, DD/MM/YY' :
+                    reformatType === 'phone' ? 'e.g., (XXX) XXX-XXXX, XXX-XXX-XXXX, +1-XXX-XXX-XXXX' :
+                    reformatType === 'currency' ? 'e.g., $X,XXX.XX, €X.XXX,XX, X USD' :
+                    'Describe your custom format (e.g., UPPERCASE, Title Case, etc.)'
+                  }
+                  w="full"
+                  p="14px 16px"
+                  border="1px solid #DBE0E5"
+                  borderRadius="8px"
+                  fontSize="14px"
+                  bg="white"
+                  _focus={{
+                    outline: "none",
+                    borderColor: "#35BBF4",
+                    boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                  }}
+                />
+              </FormControl>
+            )}
+          </VStack>
+        );
+      
+      case 'Concatenate':
+        return (
+          <VStack spacing={4} mt={4}>
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Source Fields to Combine
+              </FormLabel>
+              <Text fontSize="12px" color="#666" mb={2}>
+                Select multiple fields to combine (hold Ctrl/Cmd to select multiple)
+              </Text>
+              <Select
+                multiple
+                value={selectedSourceFields}
+                onChange={(e) => {
+                  const values = Array.from(e.target.selectedOptions, option => option.value);
+                  setSelectedSourceFields(values);
+                }}
+                w="full"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                minH="120px"
+                sx={{
+                  appearance: "none",
+                  backgroundImage: "none",
+                  "&::-webkit-appearance": "none",
+                  "&::-moz-appearance": "none"
+                }}
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              >
+                {getAllSourceFields().map((field) => (
+                  <option key={field} value={field}>
+                    {field}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Separator
+              </FormLabel>
+              <Input
+                value={separatorValue}
+                onChange={(e) => setSeparatorValue(e.target.value)}
+                placeholder="e.g., ', ' or ' - '"
+                w="full"
+                p="14px 16px"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Logic
+              </FormLabel>
+              <Textarea
+                value={transformationLogic}
+                onChange={(e) => setTransformationLogic(e.target.value)}
+                placeholder="Describe the transformation logic"
+                w="full"
+                p="14px 16px"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                minH="60px"
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              />
+            </FormControl>
+          </VStack>
+        );
+      
+      case 'Extract':
+        return (
+          <VStack spacing={4} mt={4}>
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Source Fields
+              </FormLabel>
+              <Text fontSize="12px" color="#666" mb={2}>
+                Select one or more fields to extract from (hold Ctrl/Cmd to select multiple)
+              </Text>
+              <Select
+                multiple
+                value={selectedSourceFields}
+                onChange={(e) => {
+                  const values = Array.from(e.target.selectedOptions, option => option.value);
+                  setSelectedSourceFields(values);
+                }}
+                w="full"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                minH="120px"
+                sx={{
+                  appearance: "none",
+                  backgroundImage: "none",
+                  "&::-webkit-appearance": "none",
+                  "&::-moz-appearance": "none"
+                }}
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              >
+                {getAllSourceFields().map((field) => (
+                  <option key={field} value={field}>
+                    {field}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontSize="14px" fontWeight="450" color="#333">
+                Logic
+              </FormLabel>
+              <Textarea
+                value={transformationLogic}
+                onChange={(e) => setTransformationLogic(e.target.value)}
+                placeholder="Describe what part to extract (e.g., Extract first letter of first name and first letter of last name from Donor Name field, concatenate with no space)"
+                w="full"
+                p="14px 16px"
+                border="1px solid #DBE0E5"
+                borderRadius="8px"
+                fontSize="14px"
+                bg="white"
+                minH="80px"
+                _focus={{
+                  outline: "none",
+                  borderColor: "#35BBF4",
+                  boxShadow: "0 0 0 3px rgba(53, 187, 244, 0.1)"
+                }}
+              />
+            </FormControl>
+          </VStack>
+        );
+      
       case 'Copy':
         return (
           <FormControl mt={4}>
@@ -285,7 +529,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
             <Select
               value={selectedSourceField}
               onChange={(e) => setSelectedSourceField(e.target.value)}
-              p="14px 16px"
+              w="full"
               border="1px solid #DBE0E5"
               borderRadius="8px"
               fontSize="14px"
@@ -304,12 +548,20 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
             </Select>
           </FormControl>
         );
-
+      
+      case 'Blank':
+        return (
+          <Box mt={4} p="16px" bg="#F8FAFB" borderRadius="8px" border="1px solid #DBE0E5">
+            <Text fontSize="14px" color="#666" fontStyle="italic">
+              This field will be left empty in the output.
+            </Text>
+          </Box>
+        );
+      
       default:
         return null;
     }
   };
-
   const customStyles = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600;700&display=swap');
 
@@ -584,7 +836,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
               <Select
                 value={selectedRuleType}
                 onChange={(e) => setSelectedRuleType(e.target.value)}
-                p="14px 16px"
+                w="full"
                 border="1px solid #DBE0E5"
                 borderRadius="8px"
                 fontSize="14px"
