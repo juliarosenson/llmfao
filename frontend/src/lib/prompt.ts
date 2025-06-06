@@ -1,14 +1,12 @@
 import axios from 'axios';
 // The full mapping type
 export interface ColumnMapping {
-  rule_number: number;
   target_column: string;
   type: "Copy" | "Reformat" | "Concatenate" | "Extract" | "Static" | "Blank";
   source_fields: string[];
   transformation_logic: string;
   confidence: "High" | "Medium" | "Low";
   needs_attention: boolean;
-  notes: string;
 }
 // The response is an array of these:
 export type ColumnMappingsResponse = {
@@ -113,14 +111,12 @@ Output Format
 {
   "columnMappings": [
     {
-      "rule_number": 1,
       "target_column": "target_field_name",
       "type": "Copy|Reformat|Concatenate|Extract|Static|Blank",
       "source_fields": ["source_field_1", "source_field_2"],
       "transformation_logic": "Detailed description of the transformation",
       "confidence": "High|Medium|Low",
       "needs_attention": false,
-      "notes": "Any assumptions, edge cases, or clarifications"
     }
   ],
   "summary": {

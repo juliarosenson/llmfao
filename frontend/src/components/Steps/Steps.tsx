@@ -15,9 +15,10 @@ export type Template = {
 interface StepsProps {
   step: number; // 1-based index for the current step
   setStep: (step: number) => void;
+  onBackToHome?: () => void;
 }
 
-const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
+const Steps: React.FC<StepsProps> = ({ step, setStep, onBackToHome }) => {
   // State for rules
   const [rules, setRules] = React.useState<ColumnMappingsResponse["columnMappings"]>();
   const [templateName, setTemplateName] = React.useState<string>()
@@ -27,7 +28,11 @@ const Steps: React.FC<StepsProps> = ({ step, setStep }) => {
 
   // Handler for going back from Upload
   const handleBack = () => {
-    setStep(step - 1);
+    if (onBackToHome) {
+      onBackToHome();
+    } else {
+      setStep(step - 1);
+    }
   };
 
   // Handler for continuing from Upload
