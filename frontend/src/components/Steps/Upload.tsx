@@ -6,6 +6,7 @@ import {
   FormControl,
   FormLabel,
   HStack,
+  Image,
   Input,
   Text,
   useToast,
@@ -14,6 +15,7 @@ import {
   Select
 } from '@chakra-ui/react';
 import React, { useRef } from 'react';
+import joke1Image from '../../lib/joke_1.png';
 
 interface UploadProps {
   templateName?: string;
@@ -173,9 +175,13 @@ const Upload: React.FC<UploadProps> = ({
               color="blue.500"
               size="xl"
             />
-            <Text fontSize="lg" color="white" fontWeight="bold">
-              Generating Rules...
-            </Text>
+            <Image
+              src={joke1Image}
+              alt="Loading joke"
+              maxW="300px"
+              maxH="200px"
+              objectFit="contain"
+            />
           </VStack>
         </Box>
       )}

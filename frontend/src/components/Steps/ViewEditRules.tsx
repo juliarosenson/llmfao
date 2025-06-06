@@ -8,6 +8,7 @@ import {
   FormControl,
   FormLabel,
   HStack,
+  Image,
   Input,
   Modal,
   ModalBody,
@@ -27,6 +28,7 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { ColumnMapping, ColumnMappingsResponse } from '../../lib/prompt';
+import chihuahuaChariotGif from '../../lib/chihuahua-chariot.gif';
 
 interface ViewEditRulesProps {
   rules?: ColumnMappingsResponse["columnMappings"];
@@ -121,6 +123,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
   const [selectedRuleType, setSelectedRuleType] = React.useState<string>('');
   const [hardcodeValue, setHardcodeValue] = React.useState<string>('');
   const [reformatType, setReformatType] = React.useState<string>('');
+  const [formatPattern, setFormatPattern] = React.useState<string>('');
   const [separatorValue, setSeparatorValue] = React.useState<string>(', ');
   const [transformationLogic, setTransformationLogic] = React.useState<string>('');
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -151,7 +154,9 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
         break;
       case 'Reformat':
         if (selectedSourceField) {
-          if (reformatType) {
+          if (formatPattern) {
+            newTransformationLogic = `Convert ${selectedSourceField} to ${formatPattern} format`;
+          } else if (reformatType) {
             newTransformationLogic = `Convert ${selectedSourceField} to ${reformatType} format`;
           } else {
             newTransformationLogic = `Reformat ${selectedSourceField} for ${editingMapping.target_column}`;
@@ -173,7 +178,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
     }
 
     setTransformationLogic(newTransformationLogic);
-  }, [editingMapping, selectedRuleType, selectedSourceField, selectedSourceFields, separatorValue, hardcodeValue, reformatType]);
+  }, [editingMapping, selectedRuleType, selectedSourceField, selectedSourceFields, separatorValue, hardcodeValue, reformatType, formatPattern]);
 
   // Auto-update transformation logic when relevant fields change
   React.useEffect(() => {
@@ -209,7 +214,16 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
     // Reset other fields
     setHardcodeValue('');
     setReformatType('');
+    setFormatPattern('');
     setSeparatorValue(', ');
+
+    // For static rules, extract the value from transformation logic
+    if (mapping.type === 'Static' && mapping.transformation_logic) {
+      const match = mapping.transformation_logic.match(/Set to static value: "(.*)"/);
+      if (match && match[1]) {
+        setHardcodeValue(match[1]);
+      }
+    }
 
     onOpen();
   };
@@ -230,6 +244,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
           break;
         case 'Reformat':
           updatedSourceFields = [selectedSourceField];
+          updateTransformationLogic();
           break;
         case 'Extract':
           updatedSourceFields = selectedSourceFields;
@@ -392,6 +407,8 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
                   Format Pattern
                 </FormLabel>
                 <Input
+                  value={formatPattern}
+                  onChange={(e) => setFormatPattern(e.target.value)}
                   placeholder={
                     reformatType === 'date' ? 'e.g., MM/DD/YYYY, YYYY-MM-DD, DD/MM/YY' :
                     reformatType === 'phone' ? 'e.g., (XXX) XXX-XXXX, XXX-XXX-XXXX, +1-XXX-XXX-XXXX' :
@@ -687,16 +704,13 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
           zIndex="9999"
         >
           <VStack spacing={4}>
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="xl"
+            <Image
+              src={chihuahuaChariotGif}
+              alt="Loading animation"
+              width="550px"
+              height="400px"
+              objectFit="fill"
             />
-            <Text fontSize="lg" color="white" fontWeight="bold">
-              Generating Preview...
-            </Text>
           </VStack>
         </Box>
       )}
@@ -974,7 +988,7 @@ const ViewEditRules: React.FC<ViewEditRulesProps> = ({
                 bg: "linear-gradient(135deg, #2da8d8 0%, #2596c4 100%)"
               }}
             >
-              Apply Changes
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>

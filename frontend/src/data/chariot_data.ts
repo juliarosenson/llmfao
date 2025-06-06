@@ -42,7 +42,7 @@ export const CHARIOT_DATA = [
       "nonprofit_address": null,
       "additional_details": "Reason: User Donation / Project: CENTRAL PARK CONSERVANCY INC / Frequency: Recurring / Fee Comment: / Project Remote ID:",
       "fundraising_platform": null,
-      "assignee": "jane doe"
+      "assignee": "Jane Doe"
     },
     {
       "donation_id": "opp_01jwejpn98ntgzyj5cxvywq0p4",
@@ -132,7 +132,7 @@ export const CHARIOT_DATA = [
       "nonprofit_address": null,
       "additional_details": null,
       "fundraising_platform": "The Chesed Fund",
-      "assignee": "sam adams"
+      "assignee": "Sam Adams"
     },
     {
       "donation_id": "opp_01jw4tsb2jd8rghzjgghb1mbgz",
@@ -177,7 +177,7 @@ export const CHARIOT_DATA = [
       "nonprofit_address": "151 W 30th St New York City, NY 10001",
       "additional_details": null,
       "fundraising_platform": "GoFundMe",
-      "assignee": "john doe"
+      "assignee": "John Doe"
     },
     {
       "donation_id": "opp_01jvvvtkczxw786n0z5hshpwkt",
@@ -222,6 +222,6 @@ export const CHARIOT_DATA = [
       "nonprofit_address": "717 FIFTH AVENUE 5TH FL, NEW YORK, NY, 10022, US",
       "additional_details": "Ren Disbursement Method: Ren for Charities ACH / Acknowledgement: Cynthia Alekel Mohr and Family Foundation",
       "fundraising_platform": "GoFundMe",
-      "assignee": "john doe"
-    }
+      "assignee": "Jim Beam"
+ }
   ]

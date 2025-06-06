@@ -72,6 +72,7 @@ const Steps: React.FC<StepsProps> = ({ step, setStep, onBackToHome }) => {
     }
 
     try {
+      console.log('final rules', rules);
       const res = await submitFinalExportPrompt(
         rules,
         JSON.stringify(CHARIOT_DATA),
