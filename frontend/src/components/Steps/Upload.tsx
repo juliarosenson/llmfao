@@ -39,6 +39,7 @@ const Upload: React.FC<UploadProps> = ({
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = React.useState(false);
+  const [crmProvider, setCrmProvider] = React.useState<string>('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCrmFile(e.target.files?.[0] || null);
@@ -60,6 +61,7 @@ const Upload: React.FC<UploadProps> = ({
     console.log('Continuing with file:', crmFile);
     console.log('Template Name:', templateName);
     console.log('File Name Pattern:', fileNamePattern);
+    console.log('CRM Provider:', crmProvider);
     try {
       if (!crmFile) {
         toast({
@@ -178,116 +180,9 @@ const Upload: React.FC<UploadProps> = ({
         </Box>
       )}
 
-      <Flex minH="100vh" className="upload-container">
-        {/* Sidebar */}
-        <Box
-          w="280px"
-          bg="white"
-          borderRight="1px solid #DBE0E5"
-          p="24px"
-        >
-          <Text
-            fontSize="18px"
-            fontWeight="500"
-            mb="24px"
-            color="#333"
-          >
-            Export Template
-          </Text>
-
-          <VStack spacing="8px" align="stretch">
-            {/* Active Step */}
-            <Box
-              display="flex"
-              alignItems="center"
-              p="10px 16px"
-              borderRadius="8px"
-              bg="#35BBF4"
-              color="white"
-              fontSize="14px"
-              fontWeight="500"
-            >
-              <Box
-                w="24px"
-                h="24px"
-                borderRadius="50%"
-                bg="white"
-                color="#35BBF4"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mr="12px"
-                fontSize="12px"
-                fontWeight="600"
-              >
-                1
-              </Box>
-              <Text>File Set Up</Text>
-            </Box>
-
-            {/* Inactive Steps */}
-            <Box
-              display="flex"
-              alignItems="center"
-              p="10px 16px"
-              borderRadius="8px"
-              bg="#F6F8FA"
-              color="#666"
-              border="1px solid #DBE0E5"
-              fontSize="14px"
-              fontWeight="500"
-            >
-              <Box
-                w="24px"
-                h="24px"
-                borderRadius="50%"
-                bg="#DBE0E5"
-                color="white"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mr="12px"
-                fontSize="12px"
-                fontWeight="600"
-              >
-                2
-              </Box>
-              <Text>Review Rules</Text>
-            </Box>
-
-            <Box
-              display="flex"
-              alignItems="center"
-              p="10px 16px"
-              borderRadius="8px"
-              bg="#F6F8FA"
-              color="#666"
-              border="1px solid #DBE0E5"
-              fontSize="14px"
-              fontWeight="500"
-            >
-              <Box
-                w="24px"
-                h="24px"
-                borderRadius="50%"
-                bg="#DBE0E5"
-                color="white"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mr="12px"
-                fontSize="12px"
-                fontWeight="600"
-              >
-                3
-              </Box>
-              <Text>Preview & Save</Text>
-            </Box>
-          </VStack>
-        </Box>
-
+      <Box minH="100vh" bg="white" className="upload-container">
         {/* Main Content */}
-        <Box flex="1" p="32px 48px" maxW="1200px">
+        <Box p="32px 48px" maxW="1200px" mx="auto">
           {/* Back Button */}
           <Button
             variant="link"
@@ -397,12 +292,15 @@ const Upload: React.FC<UploadProps> = ({
                   CRM Provider
                 </FormLabel>
                 <Select
+                  value={crmProvider}
+                  onChange={e => setCrmProvider(e.target.value)}
                   placeholder="Select your CRM provider"
                   p="14px 16px"
                   border="1px solid #DBE0E5"
                   borderRadius="8px"
                   fontSize="14px"
                   bg="white"
+                  w="100%"
                   _focus={{
                     outline: "none",
                     borderColor: "#35BBF4",
@@ -410,8 +308,10 @@ const Upload: React.FC<UploadProps> = ({
                   }}
                 >
                   <option value="salesforce">Salesforce</option>
-                  <option value="hubspot">HubSpot</option>
-                  <option value="pipedrive">Pipedrive</option>
+                  <option value="raisers-edge">Raiser's Edge</option>
+                  <option value="virtuous">Virtuous</option>
+                  <option value="admire">Admire</option>
+                  <option value="everyaction">EveryAction</option>
                   <option value="other">Other</option>
                 </Select>
               </FormControl>
@@ -494,7 +394,7 @@ const Upload: React.FC<UploadProps> = ({
             </Button>
           </Flex>
         </Box>
-      </Flex>
+      </Box>
     </>
   );
 };
